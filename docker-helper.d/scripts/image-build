@@ -16,7 +16,7 @@ fi
 IMAGE_NAME="$1"
 
 custom_args=""
-progress="auto"
+progress="plain"
 show_cmd=""
 target=""
 

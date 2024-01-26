@@ -26,4 +26,7 @@ clamav_start
 service_ctrl spamassassin start
 service_ctrl cron start
 
+service_ctrl apache2 start
+service_ctrl postgresql start
+
 env_add /var/run/hestiacp-startup.conf "STARTUP_DATE" "$(date +'%Y-%m-%d %H:%M:%S')"

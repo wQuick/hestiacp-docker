@@ -16,7 +16,7 @@ RUN apt-get -y update \
         jq acl openssl openvpn vim htop geoip-database dirmngr gnupg zlib1g-dev lsb-release apt-transport-https \
         ca-certificates perl libperl-dev libgd3 libgd-dev libgeoip1 libgeoip-dev geoip-bin libxml2 libxml2-dev \
         libxslt1.1 libxslt1-dev libxslt-dev lftp libmaxminddb0 libmaxminddb-dev mmdb-bin python python3 python-pip \
-        python3-pip isync gawk socat nmap \
+        python3-pip isync gawk socat nmap mc \
     && test -L /sbin/chkconfig || ln -sf /usr/sbin/sysv-rc-conf /sbin/chkconfig \
     && test -L /sbin/nologin || ln -sf /usr/sbin/nologin /sbin/nologin \
     && rm -rf /var/lib/apt/lists/*
@@ -86,14 +86,27 @@ RUN if [ ! -d /tmp/hestiacp ]; then \
 ### Temporary
     && if [ -n "$ZLIB_VERSION" ]; then \
         sed -Ei "s|^ZLIB_V=.*|ZLIB_V='$ZLIB_VERSION'|" /tmp/hestiacp/src/hst_autocompile.sh; \
-    fi \
+    fi 
+###
+    #sed -Ei "s|cp -rf bin func install web.*|cd  |" /tmp/hestiacp/src/hst_autocompile.sh; \    
+
+COPY mod/hst_autocompile.sh /tmp/hestiacp/src/hst_autocompile.sh
+
+COPY mod/package.json /tmp/hestiacp/package.json
+
+COPY mod/package-lock.json /tmp/hestiacp/package-lock.json
+
+#   $hestia_dir/install/deb/nginx/nginx.conf
+COPY mod/nginx.conf /tmp/hestiacp/install/deb/nginx/nginx.conf
+
 ### Compile Hestia Packages
-    && cd /tmp/hestiacp/src \
-    && bash ./hst_autocompile.sh --all --noinstall --keepbuild '~localsrc' \
+RUN \
+    cd /tmp/hestiacp/src \
+    && bash ./hst_autocompile.sh --all --noinstall --keepbuild --debug '~localsrc' \
 ### Install Hestia
     && cd /tmp/hestiacp/install \
-    && bash ./hst-install-debian-docker.sh --apache no --phpfpm yes --multiphp yes --vsftpd yes --proftpd no \
-        --named yes --mysql yes --postgresql no --exim yes --dovecot yes --sieve yes --clamav yes --spamassassin yes \
+    && bash ./hst-install-debian-docker.sh --apache yes --phpfpm yes --multiphp yes --vsftpd yes --proftpd no \
+        --named yes --mysql yes --postgresql yes --exim yes --dovecot yes --sieve yes --clamav yes --spamassassin yes \
         --iptables yes --fail2ban yes --quota yes --api yes --interactive no --port 8083 \
         --hostname server.hestiacp.localhost --email admin@example.com --password admin --lang en \
         --with-debs /tmp/hestiacp-src/deb/ --force \
@@ -117,8 +130,8 @@ RUN if grep "reload-or-restart" /usr/local/hestia/bin/v-restart-service; then \
 # Remove autoupdate cron
     && /usr/local/hestia/bin/v-delete-cron-hestia-autoupdate \
 # Remove buttons from Hestia update page
-    && sed -i "/type=\"checkbox\"/d" /usr/local/hestia/web/templates/pages/list_updates.html \
-    && sed -Ei "/href=\"<\?=\\\$btn_url\;\?>\"/d" /usr/local/hestia/web/templates/pages/list_updates.html \
+ #   && sed -i "/type=\"checkbox\"/d" /usr/local/hestia/web/templates/pages/list_updates.php \
+    && sed -Ei "/href=\"<\?= \\\$btn_url \?>\"/d" /usr/local/hestia/web/templates/pages/list_updates.php \
 # Block updates of Hestia packages in APT
     && apt-mark hold hestia \
     && apt-mark hold hestia-nginx \

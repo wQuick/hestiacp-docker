@@ -148,6 +148,7 @@ if [[ "$CONTAINER_RECREATED" == "yes" ]]; then
                 fi
 
                 sed -Ei "s/(listen\s+).*(80|443)/\1${current_container_ip}:\2/g" "/etc/nginx/conf.d/domains/$current_container_ip.conf"
+                sed -Ei "s/(proxy_pass http:\/\/\s+).*(8080|8443)/\1${current_container_ip}:\2/g" "/etc/nginx/conf.d/domains/$current_container_ip.conf"
 
                 if [[ -z "$(grep -E "listen\s+${current_container_ip}:80" "/etc/nginx/conf.d/domains/$current_container_ip.conf")" || -z "$(grep -E "listen\s+${current_container_ip}:443" "/etc/nginx/conf.d/domains/$current_container_ip.conf")" ]]; then
                     rm -f "/etc/nginx/conf.d/domains/$current_container_ip.conf"
@@ -163,6 +164,12 @@ if [[ "$CONTAINER_RECREATED" == "yes" ]]; then
             #    sed --follow-symlinks -Ei "s|(listen\s+)$last_container_ip:|\1$current_container_ip:|g" /etc/nginx/conf.d/domains/* 2>/dev/null
             #fi
         fi
+
+		# Update default Apache server
+		mv /etc/apache2/conf.d/172.*.conf "/etc/apache2/conf.d/$current_container_ip.conf"
+		sed -Ei "s/(Listen\s+).*(8080|8443)/\1${current_container_ip}:\2/g" "/etc/apache2/conf.d/$current_container_ip.conf"
+		sed -Ei "s/(VirtualHost\s+).*(8080|8443)/\1${current_container_ip}:\2/g" "/etc/apache2/conf.d/$current_container_ip.conf"
+		sed -Ei "s/(ServerName\s+).*$/\1${current_container_ip}/g" "/etc/apache2/conf.d/$current_container_ip.conf"
 
         # Update nat
         container_ip_nat="$(sed -En "s/^NAT='(.*)'$/\1/p" "/conf/usr/local/hestia/data/ips/$current_container_ip")"

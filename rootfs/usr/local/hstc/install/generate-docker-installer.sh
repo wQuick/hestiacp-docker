@@ -49,7 +49,7 @@ sed -Ei "s|\- MariaDB Database Server|\- MariaDB Database Client|g" "$hestia_dir
 check_result "$hestia_dir/install/hst-install-debian-docker.sh" "\- MariaDB Database Client"
 sed -Ei "s|(mariadb-common) mariadb-server|\1|g" "$hestia_dir/install/hst-install-debian-docker.sh"
 check_result "$hestia_dir/install/hst-install-debian-docker.sh" "mariadb-common mariadb-server" invert
-sed -Ezi "s|(.*Configure MariaDB[\ #\n\-]*if )(\[ \"\\\$mysql\" = 'yes' \])|\1\[ -z 'mysql-disabled' \]|g" "$hestia_dir/install/hst-install-debian-docker.sh"
+sed -Ezi "s|(.*Configure MariaDB / MySQL[\ #\n\-]*if )(\[ \"\\\$mysql\" = 'yes' \] \|\| \[ \"\\\$mysql8\" = 'yes' \])|\1\[ -z 'mysql-disabled' \]|g" "$hestia_dir/install/hst-install-debian-docker.sh"
 check_result "$hestia_dir/install/hst-install-debian-docker.sh" "if \[ -z 'mysql-disabled' \]"
 sed -Ei "s|(.*/v-add-database-host mysql .*)|#\1\necho \"---\"|" "$hestia_dir/install/hst-install-debian-docker.sh"
 check_result "$hestia_dir/install/hst-install-debian-docker.sh" "#.*/v-add-database-host mysql .*"
@@ -64,8 +64,8 @@ sed -Ei "/\[ \* \] Hestia Control Panel/,/^gpg.*hestia-keyring.gpg/ s/(.*)/#\1/"
 check_result "$hestia_dir/install/hst-install-debian-docker.sh" "#gpg.*hestia-keyring.gpg"
 
 # Removes the server's default domain creation
-sed -Ei "s|(\\\$HESTIA/bin/v-add-web-domain admin \\\$servername)|\#\1|" "$hestia_dir/install/hst-install-debian-docker.sh"
-check_result "$hestia_dir/install/hst-install-debian-docker.sh" "#\\\$HESTIA/bin/v-add-web-domain admin \\\$servername"
+sed -Ei "s|(\\\$HESTIA/bin/v-add-web-domain admin \"\\\$servername\" \"\\\$ip\")|\#\1|" "$hestia_dir/install/hst-install-debian-docker.sh"
+check_result "$hestia_dir/install/hst-install-debian-docker.sh" "#\\\$HESTIA/bin/v-add-web-domain admin \"\\\$servername\" \"\\\$ip\""
 sed -Ei "s|(check_result \\\$\? \"can't create \\\$servername domain\")|#\1|" "$hestia_dir/install/hst-install-debian-docker.sh"
 check_result "$hestia_dir/install/hst-install-debian-docker.sh" "#check_result \\\$\? \"can't create \\\$servername domain\""
 
@@ -76,5 +76,20 @@ check_result "$hestia_dir/bin/v-add-sys-roundcube" "'db-config-disabled'"
 # Avoid errors caused by "reload-or-restart" when trying to restart services
 sed -Ei "s%systemctl reload\-or\-restart .*%service \"\\\$service\" reload > /dev/null 2>\&1 || service \"\\\$service\" restart > /dev/null 2>\&1%g" "$hestia_dir/bin/v-restart-service"
 check_result "$hestia_dir/bin/v-restart-service" "reload-or-restart" invert
+
+#sed -Ei "s|systemctl restart \"\\\$service\"|service \"\\\$service\" restart|" "$hestia_dir/bin/v-restart-service"
+sed -Ei "s/systemctl restart \"\\\$service\"/service \"\\\$service\" restart/" "$hestia_dir/bin/v-restart-service"
+#check_result "$hestia_dir/install/hst-install-debian-docker.sh" "service \"\\\$service\" restart"
+
+sed -Ei "s/mariadb -h \\\$HOST -u \\\$USER -p\\\$PASSWORD \\\$DB/mariadb -h mariadb -u \\\$USER -p\\\$PASSWORD \\\$DB/" "$hestia_dir/func/rebuild.sh"
+
+#sed -Ei "s|( )|#\1|" "$hestia_dir/install/hst-install-debian-docker.sh"
+#check_result "$hestia_dir/install/hst-install-debian-docker.sh" "# "
+#sed -Ei "s|(include                         /etc/nginx/conf.d/cloudflare.inc;)|include                         /etc/nginx/conf.d/general/cloudflare.inc;|" "$hestia_dir/install/deb/nginx/nginx.conf"
+#check_result "$hestia_dir/install/deb/nginx/nginx.conf" "include                         /etc/nginx/conf.d/general/cloudflare.inc;"
+
+#sed -Ei "s|(Early-Data \\\$rfc_early_data)|Early-Data \\\$ssl_early_data|" "$hestia_dir/install/deb/nginx/nginx.conf"
+#check_result "$hestia_dir/install/deb/nginx/nginx.conf" "Early-Data \\\$ssl_early_data"
+
 
 echo "Changes applied"

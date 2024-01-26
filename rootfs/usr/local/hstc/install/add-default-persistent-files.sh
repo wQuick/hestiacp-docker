@@ -4,6 +4,11 @@
 
 mkdir -p /conf-start
 
+bash /usr/local/hstc/install/make-persistent.sh  /etc/my_init.d/10_updates.sh yes
+bash /usr/local/hstc/install/make-persistent.sh  /etc/my_init.d/15_container.sh yes
+bash /usr/local/hstc/install/make-persistent.sh  /etc/my_init.d/20_first-running-pt1.sh yes
+bash /usr/local/hstc/install/make-persistent.sh  /etc/my_init.d/25_start-services.sh yes
+bash /usr/local/hstc/install/make-persistent.sh  /etc/my_init.d/30_first-running-pt2.sh yes
 #bash /usr/local/hstc/install/make-persistent.sh /etc/bind/conf.d
 bash /usr/local/hstc/install/make-persistent.sh /etc/bind/named.conf yes
 bash /usr/local/hstc/install/make-persistent.sh /etc/bind/named.conf.options yes
@@ -12,6 +17,7 @@ bash /usr/local/hstc/install/make-persistent.sh /etc/fail2ban/jail.local yes
 bash /usr/local/hstc/install/make-persistent.sh /etc/nginx/conf.d/domains
 #bash /usr/local/hstc/install/make-persistent.sh /etc/nginx/conf.d/fastcgi_cache_pool.conf yes
 bash /usr/local/hstc/install/make-persistent.sh /etc/nginx/conf.d/pre-domains
+bash /usr/local/hstc/install/make-persistent.sh /etc/apache2/conf.d/domains
 for php_path in /etc/php/*; do
     php_version="$(basename -- "$php_path")";
     bash /usr/local/hstc/install/make-persistent.sh /etc/php/${php_version}/fpm/pool.d;
