@@ -120,6 +120,7 @@ sed -Ei "s|\\\$\(gen_pass\)|\\\${1:-\\\$\(/usr/local/hstc/bin/v-gen-pass\)}|" /u
 sed -Ei "s|(\['host'\] = ')localhost(';)|\1mariadb\2|" /usr/local/hestia/install/deb/phpmyadmin/pma.sh
 sed -Ei "s|@'localhost'|@'%'|g" /usr/local/hestia/install/deb/phpmyadmin/pma.sh
 sed -Ei "s|\\\$HESTIA_INSTALL_DIR|/usr/local/hestia/install/deb|" /usr/local/hestia/install/deb/phpmyadmin/pma.sh
+sed -Ei "s|\\\$mysql -e|\\\$mysql_server -e|" /usr/local/hestia/install/deb/phpmyadmin/pma.sh
 
 
 ###
