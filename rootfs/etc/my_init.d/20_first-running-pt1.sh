@@ -72,8 +72,8 @@ if [[ "$FIRST_RUNNING" == "yes" ]]; then
     run_sql "CREATE DATABASE roundcube;"
     run_sql "GRANT ALL ON roundcube.* TO roundcube@'%' IDENTIFIED BY '$ROUNDCUBE_DB_PASSWORD';"
     run_sql "USE roundcube; source /var/lib/roundcube/SQL/mysql.initial.sql;"
-    sed -Ei "s|(\\\$config\['db_dsnw'\] = ').*(';)|\1mysql://roundcube:$ROUNDCUBE_DB_PASSWORD@mariadb/roundcube\2|" /conf/etc/roundcube/config.inc.php
-    sed -Ei "s|(\\\$config\['des_key'\] = ').*(';)|\1$ROUNDCUBE_DES_KEY\2|" /conf/etc/roundcube/config.inc.php
+    sed -Ei "s|(\\\$config\[\"db_dsnw\"\] = \").*(\";)||\1mysql://roundcube:$ROUNDCUBE_DB_PASSWORD@mariadb/roundcube\2|" /conf/etc/roundcube/config.inc.php
+    sed -Ei "s|(\\\$config\[\"des_key\"\] = \").*(\";)|\1$ROUNDCUBE_DES_KEY\2|" /conf/etc/roundcube/config.inc.php
 
     ###
     ## ClamAV
