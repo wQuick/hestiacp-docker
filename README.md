@@ -11,7 +11,7 @@
 ## How to use this image
 
 ```bash
-wget https://raw.githubusercontent.com/jhmaverick/hestiacp-docker/main/docker-compose.yml
+wget https://raw.githubusercontent.com/wquick/hestiacp-docker/main/docker-compose.yml
 HSTC_HOSTNAME="example.com" docker-compose up -d
 ```
 
